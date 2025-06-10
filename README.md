@@ -7,10 +7,8 @@
 가비아 클라우드 서버 웹 콘솔에서 다음 명령어 하나만 실행하면 됩니다:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/[사용자명]/[저장소명]/main/github_deploy.sh | bash
+curl -sSL https://raw.githubusercontent.com/yeong7513/urban-farm-deploy/master/github_deploy.sh | bash
 ```
-
-> **주의**: `[사용자명]`과 `[저장소명]`을 실제 GitHub 정보로 변경하세요!
 
 ## ✨ 배포 완료 후
 
@@ -106,8 +104,8 @@ urban-farm/
 
 ### 1. 저장소 클론
 ```bash
-git clone https://github.com/[사용자명]/[저장소명].git
-cd urban-farm
+git clone https://github.com/yeong7513/urban-farm-deploy.git
+cd urban-farm-deploy
 ```
 
 ### 2. 가상환경 생성

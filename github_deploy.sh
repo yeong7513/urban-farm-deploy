@@ -12,11 +12,11 @@ apt install -y python3 python3-pip python3-venv mysql-server nginx supervisor gi
 echo "📥 GitHub에서 프로젝트 다운로드 중..."
 cd /home
 rm -rf urbanfarm
-git clone https://github.com/[사용자명]/[저장소명].git urbanfarm
+git clone https://github.com/yeong7513/urban-farm-deploy.git urbanfarm
 # 또는 ZIP 다운로드 방식:
-# curl -L https://github.com/[사용자명]/[저장소명]/archive/main.zip -o urbanfarm.zip
+# curl -L https://github.com/yeong7513/urban-farm-deploy/archive/master.zip -o urbanfarm.zip
 # unzip urbanfarm.zip
-# mv [저장소명]-main urbanfarm
+# mv urban-farm-deploy-master urbanfarm
 
 cd /home/urbanfarm
 
