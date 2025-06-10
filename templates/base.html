@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}어반팜 - 친환경 도시 농업 플랫폼{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'urban-green': '#4CAF50',
+                        'urban-light-green': '#8BC34A',
+                        'urban-brown': '#A1887F',
+                        'urban-yellow': '#FFC107',
+                        'urban-bg': '#F9F9F9'
+                    },
+                    fontFamily: {
+                        'korean': ['Noto Sans KR', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .hero-gradient {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        }
+        .card-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="h-full bg-urban-bg">
+    <!-- 네비게이션 -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50" x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- 로고 -->
+                    <a href="{{ url_for('index') }}" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-urban-green rounded-full flex items-center justify-center">
+                            <i class="fas fa-seedling text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-urban-green">어반팜</span>
+                    </a>
+                    
+                    <!-- 데스크톱 메뉴 -->
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="{{ url_for('index') }}" class="text-gray-700 hover:text-urban-green px-3 py-2 rounded-md text-sm font-medium transition-colors">홈</a>
+                        <a href="{{ url_for('community') }}" class="text-gray-700 hover:text-urban-green px-3 py-2 rounded-md text-sm font-medium transition-colors">커뮤니티</a>
+                        <a href="#" class="text-gray-700 hover:text-urban-green px-3 py-2 rounded-md text-sm font-medium transition-colors">교육</a>
+                        <a href="#" class="text-gray-700 hover:text-urban-green px-3 py-2 rounded-md text-sm font-medium transition-colors">나눔 장터</a>
+                    </div>
+                </div>
+                
+                <!-- 사용자 메뉴 -->
+                <div class="hidden md:flex md:items-center md:space-x-4">
+                    {% if current_user.is_authenticated %}
+                        <span class="text-gray-700">안녕하세요, {{ current_user.username }}님!</span>
+                        <a href="#" class="text-gray-700 hover:text-urban-green px-3 py-2 rounded-md text-sm font-medium transition-colors">마이 페이지</a>
+                        <a href="{{ url_for('logout') }}" class="bg-urban-green text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-600 transition-colors">로그아웃</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-urban-green px-3 py-2 rounded-md text-sm font-medium transition-colors">로그인</a>
+                        <a href="{{ url_for('register') }}" class="bg-urban-green text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-600 transition-colors">회원가입</a>
+                    {% endif %}
+                </div>
+                
+                <!-- 모바일 메뉴 버튼 -->
+                <div class="md:hidden flex items-center">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-700 hover:text-urban-green focus:outline-none focus:text-urban-green">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 모바일 메뉴 -->
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{{ url_for('index') }}" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">홈</a>
+                <a href="{{ url_for('community') }}" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">커뮤니티</a>
+                <a href="#" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">교육</a>
+                <a href="#" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">나눔 장터</a>
+                
+                {% if current_user.is_authenticated %}
+                    <div class="border-t pt-2">
+                        <div class="px-3 py-2 text-sm text-gray-500">{{ current_user.username }}님</div>
+                        <a href="#" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">마이 페이지</a>
+                        <a href="{{ url_for('logout') }}" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">로그아웃</a>
+                    </div>
+                {% else %}
+                    <div class="border-t pt-2">
+                        <a href="{{ url_for('login') }}" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">로그인</a>
+                        <a href="{{ url_for('register') }}" class="block px-3 py-2 text-gray-700 hover:text-urban-green hover:bg-gray-50 rounded-md">회원가입</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 플래시 메시지 -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for message in messages %}
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" x-data="{ show: true }" x-show="show">
+                        <div class="flex justify-between items-center">
+                            <span>{{ message }}</span>
+                            <button @click="show = false" class="text-green-700 hover:text-green-900">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- 메인 콘텐츠 -->
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- 푸터 -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-urban-green rounded-full flex items-center justify-center">
+                            <i class="fas fa-seedling text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold">어반팜</span>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        도시 거주자들이 손쉽게 농작물을 재배하고, 수확물을 공유하며, 
+                        관련 지식을 교류할 수 있는 친환경 도시 농업 플랫폼입니다.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-urban-green transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-urban-green transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-urban-green transition-colors">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">서비스</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">커뮤니티</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">재배 가이드</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">나눔 장터</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">전문가 칼럼</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">고객지원</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">이용약관</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">개인정보처리방침</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">고객센터</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-urban-green transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-300">&copy; 2024 어반팜. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - 커뮤니티 - 어반팜{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 브레드크럼 -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{{ url_for('index') }}" class="text-gray-500 hover:text-urban-green">
+                    <i class="fas fa-home mr-2"></i>홈
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <a href="{{ url_for('community') }}" class="text-gray-500 hover:text-urban-green">커뮤니티</a>
+                </div>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-gray-700">{{ post.title[:30] }}{% if post.title|length > 30 %}...{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    
+    <!-- 게시글 내용 -->
+    <article class="bg-white rounded-lg shadow-sm">
+        <!-- 게시글 헤더 -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-urban-green rounded-full flex items-center justify-center">
+                            <span class="text-white font-medium">{{ post.author.username[0].upper() }}</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">{{ post.author.username }}</p>
+                            <p class="text-sm text-gray-500">{{ post.created_at.strftime('%Y년 %m월 %d일 %H:%M') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 text-sm text-gray-500">
+                        <span><i class="fas fa-eye mr-1"></i>{{ post.views }}</span>
+                        <span><i class="fas fa-comment mr-1"></i>{{ post.comments|length }}</span>
+                        <span><i class="fas fa-heart mr-1"></i>{{ post.likes }}</span>
+                    </div>
+                </div>
+                
+                {% if current_user.is_authenticated and current_user.id == post.user_id %}
+                <div class="flex items-center space-x-2">
+                    <button class="text-gray-500 hover:text-urban-green px-3 py-1 rounded">
+                        <i class="fas fa-edit mr-1"></i>수정
+                    </button>
+                    <button class="text-gray-500 hover:text-red-600 px-3 py-1 rounded">
+                        <i class="fas fa-trash mr-1"></i>삭제
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- 게시글 본문 -->
+        <div class="px-6 py-6">
+            <div class="prose max-w-none">
+                {{ post.content|replace('\n', '<br>')|safe }}
+            </div>
+        </div>
+        
+        <!-- 게시글 액션 -->
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                    <button class="flex items-center space-x-2 text-gray-600 hover:text-red-500 transition-colors"
+                            hx-post="/api/posts/{{ post.id }}/like"
+                            hx-swap="outerHTML">
+                        <i class="fas fa-heart"></i>
+                        <span>좋아요 {{ post.likes }}</span>
+                    </button>
+                    {% else %}
+                    <div class="flex items-center space-x-2 text-gray-500">
+                        <i class="fas fa-heart"></i>
+                        <span>좋아요 {{ post.likes }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <button onclick="navigator.share ? navigator.share({title: '{{ post.title }}', url: window.location.href}) : copyToClipboard(window.location.href)" 
+                            class="text-gray-600 hover:text-urban-green transition-colors px-3 py-1 rounded">
+                        <i class="fas fa-share mr-1"></i>공유
+                    </button>
+                </div>
+            </div>
+        </div>
+    </article>
+    
+    <!-- 댓글 섹션 -->
+    <div class="mt-8">
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    댓글 <span class="text-urban-green">{{ post.comments|length }}</span>
+                </h3>
+            </div>
+            
+            <!-- 댓글 작성 폼 -->
+            {% if current_user.is_authenticated %}
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <form hx-post="/api/posts/{{ post.id }}/comments" 
+                      hx-target="#comments-list" 
+                      hx-swap="afterbegin"
+                      hx-on::after-request="this.reset()">
+                    <div class="flex space-x-3">
+                        <div class="w-8 h-8 bg-urban-green rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-sm font-medium">{{ current_user.username[0].upper() }}</span>
+                        </div>
+                        <div class="flex-1">
+                            <textarea name="content" rows="3" 
+                                    placeholder="댓글을 작성해주세요..." 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-urban-green focus:border-transparent resize-none"
+                                    required></textarea>
+                            <div class="mt-2 flex justify-end">
+                                <button type="submit" 
+                                        class="bg-urban-green text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">
+                                    <i class="fas fa-comment mr-1"></i>댓글 작성
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 text-center">
+                <p class="text-gray-600 mb-3">댓글을 작성하려면 로그인이 필요합니다.</p>
+                <a href="{{ url_for('login') }}" class="bg-urban-green text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">
+                    <i class="fas fa-sign-in-alt mr-1"></i>로그인
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- 댓글 목록 -->
+            <div id="comments-list" class="divide-y divide-gray-200">
+                {% if post.comments %}
+                    {% for comment in post.comments %}
+                    <div class="px-6 py-4" x-data="{ editing: false, content: '{{ comment.content }}' }">
+                        <div class="flex space-x-3">
+                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-gray-600 text-sm font-medium">{{ comment.author.username[0].upper() }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="font-medium text-gray-900">{{ comment.author.username }}</span>
+                                    <span class="text-sm text-gray-500">{{ comment.created_at.strftime('%m/%d %H:%M') }}</span>
+                                </div>
+                                
+                                <!-- 댓글 내용 표시 -->
+                                <div x-show="!editing">
+                                    <p class="text-gray-700">{{ comment.content|replace('\n', '<br>')|safe }}</p>
+                                </div>
+                                
+                                <!-- 댓글 수정 폼 -->
+                                <div x-show="editing">
+                                    <form hx-put="/api/comments/{{ comment.id }}"
+                                          hx-target="closest div.px-6"
+                                          hx-swap="outerHTML"
+                                          @htmx:after-request="editing = false">
+                                        <textarea x-model="content" 
+                                                name="content"
+                                                rows="3"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-urban-green focus:border-transparent resize-none"
+                                                required></textarea>
+                                        <div class="mt-2 flex justify-end space-x-2">
+                                            <button type="button" @click="editing = false"
+                                                    class="text-gray-500 hover:text-gray-700 px-3 py-1 text-sm">
+                                                취소
+                                            </button>
+                                            <button type="submit"
+                                                    class="bg-urban-green text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition-colors">
+                                                수정
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                {% if current_user.is_authenticated and current_user.id == comment.user_id %}
+                                <div class="mt-2 flex items-center space-x-2" x-show="!editing">
+                                    <button @click="editing = true" class="text-xs text-gray-500 hover:text-urban-green">수정</button>
+                                    <button class="text-xs text-gray-500 hover:text-red-600"
+                                            hx-delete="/api/comments/{{ comment.id }}"
+                                            hx-confirm="정말 삭제하시겠습니까?"
+                                            hx-target="closest div.px-6">
+                                        삭제
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="px-6 py-8 text-center text-gray-500">
+                        <i class="fas fa-comment-slash text-2xl mb-2"></i>
+                        <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 관련 게시글 -->
+    <div class="mt-8">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-list text-urban-green mr-2"></i>다른 게시글
+            </h3>
+            <div class="space-y-3">
+                <!-- 이전/다음 게시글 링크 (향후 구현) -->
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <span class="text-sm text-gray-500">이전 글</span>
+                    <a href="#" class="text-sm text-gray-700 hover:text-urban-green">이전 게시글 제목</a>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-sm text-gray-500">다음 글</span>
+                    <a href="#" class="text-sm text-gray-700 hover:text-urban-green">다음 게시글 제목</a>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <a href="{{ url_for('community') }}" 
+                   class="bg-urban-green text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors inline-flex items-center">
+                    <i class="fas fa-list mr-2"></i>목록으로 돌아가기
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('링크가 복사되었습니다!');
+    });
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}회원가입 - 어반팜{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-urban-bg py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <div class="flex justify-center">
+                <div class="w-16 h-16 bg-urban-green rounded-full flex items-center justify-center">
+                    <i class="fas fa-seedling text-white text-2xl"></i>
+                </div>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+                어반팜 회원가입
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                이미 계정이 있으신가요?
+                <a href="{{ url_for('login') }}" class="font-medium text-urban-green hover:text-green-600">
+                    로그인하기
+                </a>
+            </p>
+        </div>
+        
+        <form class="mt-8 space-y-6" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="space-y-4">
+                <div>
+                    {{ form.username.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.username(class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-urban-green focus:border-urban-green focus:z-10 sm:text-sm", placeholder="사용자명을 입력하세요 (4-20자)") }}
+                    {% if form.username.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.username.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">다른 사용자들에게 표시될 이름입니다.</p>
+                </div>
+                
+                <div>
+                    {{ form.email.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.email(class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-urban-green focus:border-urban-green focus:z-10 sm:text-sm", placeholder="이메일 주소를 입력하세요") }}
+                    {% if form.email.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.email.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    {{ form.password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.password(class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-urban-green focus:border-urban-green focus:z-10 sm:text-sm", placeholder="비밀번호를 입력하세요 (최소 6자)") }}
+                    {% if form.password.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.password.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    {{ form.password2.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.password2(class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-urban-green focus:border-urban-green focus:z-10 sm:text-sm", placeholder="비밀번호를 다시 입력하세요") }}
+                    {% if form.password2.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.password2.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-center">
+                <input id="agree-terms" name="agree-terms" type="checkbox" class="h-4 w-4 text-urban-green focus:ring-urban-green border-gray-300 rounded" required>
+                <label for="agree-terms" class="ml-2 block text-sm text-gray-900">
+                    <a href="#" class="text-urban-green hover:text-green-600">이용약관</a> 및 
+                    <a href="#" class="text-urban-green hover:text-green-600">개인정보처리방침</a>에 동의합니다.
+                </label>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-urban-green hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-urban-green transition-colors">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-user-plus text-green-300 group-hover:text-green-200"></i>
+                    </span>
+                    회원가입
+                </button>
+            </div>
+            
+            <!-- 소셜 회원가입 (향후 구현) -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-urban-bg text-gray-500">또는</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <button type="button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors" disabled>
+                        <i class="fab fa-google text-red-500 mr-2"></i>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors" disabled>
+                        <i class="fas fa-comment text-yellow-500 mr-2"></i>
+                        <span>카카오</span>
+                    </button>
+                </div>
+                <p class="mt-2 text-center text-xs text-gray-500">
+                    소셜 회원가입은 곧 지원 예정입니다
+                </p>
+            </div>
+        </form>
+        
+        <!-- 가입 혜택 안내 -->
+        <div class="mt-8 p-4 bg-green-50 rounded-lg">
+            <h3 class="text-sm font-medium text-gray-900 mb-2">
+                <i class="fas fa-gift text-urban-green mr-2"></i>회원가입 혜택
+            </h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 재배 일지 작성 및 관리</li>
+                <li>• 커뮤니티 참여 및 소통</li>
+                <li>• 나눔 장터 이용</li>
+                <li>• 전문가 가이드 무료 열람</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %} 

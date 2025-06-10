@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}커뮤니티 - 어반팜{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 헤더 -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-users text-urban-green mr-3"></i>커뮤니티
+                </h1>
+                <p class="text-gray-600">도시 농업에 대한 경험과 지식을 나누는 공간입니다</p>
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="mt-4 md:mt-0">
+                <a href="{{ url_for('create_post') }}" class="bg-urban-green text-white px-6 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors inline-flex items-center">
+                    <i class="fas fa-pen mr-2"></i>글쓰기
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 검색 및 필터 -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <form method="GET" class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+                <div class="relative">
+                    <input type="text" name="search" value="{{ search }}" 
+                           placeholder="제목이나 내용으로 검색하세요..." 
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-urban-green focus:border-transparent">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="bg-urban-green text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                <i class="fas fa-search mr-2"></i>검색
+            </button>
+            {% if search %}
+            <a href="{{ url_for('community') }}" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                <i class="fas fa-times mr-2"></i>초기화
+            </a>
+            {% endif %}
+        </form>
+        
+        {% if search %}
+        <div class="mt-4 text-sm text-gray-600">
+            '<span class="font-medium">{{ search }}</span>' 검색 결과
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 게시글 목록 -->
+    <div class="bg-white rounded-lg shadow-sm">
+        {% if posts.items %}
+            <!-- 게시글 헤더 -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-700">
+                    <div class="col-span-6 md:col-span-7">제목</div>
+                    <div class="col-span-2 md:col-span-2 text-center">작성자</div>
+                    <div class="col-span-2 md:col-span-2 text-center">작성일</div>
+                    <div class="col-span-2 md:col-span-1 text-center">조회</div>
+                </div>
+            </div>
+            
+            <!-- 게시글 리스트 -->
+            <div class="divide-y divide-gray-200">
+                {% for post in posts.items %}
+                <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                    <div class="grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-6 md:col-span-7">
+                            <a href="{{ url_for('post_detail', id=post.id) }}" class="block">
+                                <h3 class="font-medium text-gray-900 hover:text-urban-green transition-colors mb-1">
+                                    {{ post.title }}
+                                </h3>
+                                {% if post.comments %}
+                                <span class="text-xs text-urban-green">
+                                    <i class="fas fa-comment mr-1"></i>{{ post.comments|length }}
+                                </span>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="col-span-2 md:col-span-2 text-center">
+                            <span class="text-sm text-gray-600">{{ post.author.username }}</span>
+                        </div>
+                        <div class="col-span-2 md:col-span-2 text-center">
+                            <span class="text-sm text-gray-500">{{ post.created_at.strftime('%m/%d') }}</span>
+                        </div>
+                        <div class="col-span-2 md:col-span-1 text-center">
+                            <span class="text-sm text-gray-500">{{ post.views }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- 빈 상태 -->
+            <div class="px-6 py-16 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-comments text-gray-400 text-2xl"></i>
+                </div>
+                {% if search %}
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">검색 결과가 없습니다</h3>
+                    <p class="text-gray-500 mb-4">다른 키워드로 검색해보세요.</p>
+                    <a href="{{ url_for('community') }}" class="text-urban-green hover:underline">
+                        전체 게시글 보기
+                    </a>
+                {% else %}
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">아직 게시글이 없습니다</h3>
+                    <p class="text-gray-500 mb-4">첫 번째 게시글을 작성해보세요!</p>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('create_post') }}" class="bg-urban-green text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors inline-flex items-center">
+                            <i class="fas fa-pen mr-2"></i>글쓰기
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="bg-urban-green text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors inline-flex items-center">
+                            <i class="fas fa-sign-in-alt mr-2"></i>로그인하고 글쓰기
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- 페이지네이션 -->
+    {% if posts.pages > 1 %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if posts.has_prev %}
+                <a href="{{ url_for('community', page=posts.prev_num, search=search) }}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            {% for page_num in posts.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != posts.page %}
+                        <a href="{{ url_for('community', page=page_num, search=search) }}" 
+                           class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            {{ page_num }}
+                        </a>
+                    {% else %}
+                        <span class="px-3 py-2 text-sm font-medium text-white bg-urban-green border border-urban-green rounded-md">
+                            {{ page_num }}
+                        </span>
+                    {% endif %}
+                {% else %}
+                    <span class="px-3 py-2 text-sm font-medium text-gray-500">…</span>
+                {% endif %}
+            {% endfor %}
+            
+            {% if posts.has_next %}
+                <a href="{{ url_for('community', page=posts.next_num, search=search) }}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+    
+    <!-- 커뮤니티 가이드라인 -->
+    <div class="mt-8 bg-green-50 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">
+            <i class="fas fa-info-circle text-urban-green mr-2"></i>커뮤니티 가이드라인
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+            <div>
+                <h4 class="font-medium mb-2">✅ 권장사항</h4>
+                <ul class="space-y-1">
+                    <li>• 도시 농업 관련 유익한 정보 공유</li>
+                    <li>• 재배 경험과 노하우 나눔</li>
+                    <li>• 서로 도움이 되는 질문과 답변</li>
+                    <li>• 예의 바른 소통</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-medium mb-2">❌ 금지사항</h4>
+                <ul class="space-y-1">
+                    <li>• 상업적 광고 및 홍보</li>
+                    <li>• 욕설, 비방, 차별적 표현</li>
+                    <li>• 도배성 게시글</li>
+                    <li>• 개인정보 노출</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
