@@ -153,3 +153,13 @@ http://localhost:5000
 ---
 
 **🌱 Urban Farm과 함께 도시에서 시작하는 친환경 농업을 경험해보세요!** 
+
+[program:urbanfarm]
+command=/home/urbanfarm/venv/bin/gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 app:app
+directory=/home/urbanfarm
+user=www-data
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/urbanfarm.log
+environment=DATABASE_URL="mysql://urbanfarm:urbanfarm123@localhost/urbanfarm_db" 

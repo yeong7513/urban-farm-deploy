@@ -22,8 +22,8 @@ database_url = os.environ.get('DATABASE_URL')
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # 로컬 개발용 설정
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/urbanfarm_db'
+    # 프로덕션 환경용 설정 (배포 시 사용)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://urbanfarm:urbanfarm123@localhost/urbanfarm_db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
